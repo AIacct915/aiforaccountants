@@ -29,14 +29,26 @@ const tools: Tool[] = [
   },
 ];
 
+const getAllTags = (tools: Tool[]): string[] => {
+  const tagSet = new Set<string>();
+  tools.forEach((tool) => tool.tags.forEach((tag) => tagSet.add(tag)));
+  return Array.from(tagSet);
+};
+
 export default function Home() {
   const [query, setQuery] = useState('');
+  const [activeTag, setActiveTag] = useState<string | null>(null);
 
-  const filteredTools = tools.filter((tool) =>
-    tool.name.toLowerCase().includes(query.toLowerCase()) ||
-    tool.description.toLowerCase().includes(query.toLowerCase()) ||
-    tool.tags.some((tag) => tag.toLowerCase().includes(query.toLowerCase()))
-  );
+  const allTags = getAllTags(tools);
+
+  const filteredTools = tools.filter((tool) => {
+    const matchesQuery =
+      tool.name.toLowerCase().includes(query.toLowerCase()) ||
+      tool.description.toLowerCase().includes(query.toLowerCase()) ||
+      tool.tags.some((tag) => tag.toLowerCase().includes(query.toLowerCase()));
+    const matchesTag = activeTag ? tool.tags.includes(activeTag) : true;
+    return matchesQuery && matchesTag;
+  });
 
   return (
     <main className="min-h-screen bg-white text-gray-900 p-6">
@@ -45,14 +57,36 @@ export default function Home() {
         <p className="text-gray-600 mt-2">Search and explore the best AI tools for accounting pros.</p>
       </header>
 
-      <section className="mb-10">
+      <section className="mb-6">
         <input
           type="text"
           placeholder="Search tools..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className="w-full border p-2 rounded-md mb-6"
+          className="w-full border p-2 rounded-md mb-4"
         />
+
+        <div className="flex flex-wrap gap-2 mb-6">
+          <button
+            onClick={() => setActiveTag(null)}
+            className={`px-3 py-1 rounded-full border ${
+              !activeTag ? 'bg-black text-white' : 'bg-gray-100 text-gray-700'
+            }`}
+          >
+            All
+          </button>
+          {allTags.map((tag, i) => (
+            <button
+              key={i}
+              onClick={() => setActiveTag(tag)}
+              className={`px-3 py-1 rounded-full border ${
+                activeTag === tag ? 'bg-black text-white' : 'bg-gray-100 text-gray-700'
+              }`}
+            >
+              {tag}
+            </button>
+          ))}
+        </div>
 
         {filteredTools.length === 0 ? (
           <p className="text-gray-500">No tools match your search.</p>
