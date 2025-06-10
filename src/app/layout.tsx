@@ -1,34 +1,23 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
+import './globals.css';
+import { Inter } from 'next/font/google';
+import type { Metadata } from 'next';
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+const inter = Inter({ subsets: ['latin'] });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-export const metadata = {
-  title: 'AI for Accountants',
-  description: 'Discover the best AI tools for accounting, tax, and finance pros.',
+export const metadata: Metadata = {
+  title: 'AI for Accountants – AI Tools Directory',
+  description: 'Discover the best AI tools for accounting, tax, and finance professionals. Curated, searchable, and always up-to-date.',
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
-      </body>
+      <head />
+      <body className={inter.className}>{children}</body>
     </html>
   );
 }
