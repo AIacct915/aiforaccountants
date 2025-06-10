@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata = {
   title: 'AI for Accountants',
-  description: 'Discover the best AI tools for accounting, finance, and bookkeeping professionals.',
+  description: 'Discover the best AI tools for accounting, tax, and finance pros.',
 };
 
 export default function RootLayout({
