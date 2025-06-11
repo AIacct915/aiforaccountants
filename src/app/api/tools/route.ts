@@ -17,8 +17,8 @@ export async function GET() {
     }));
 
     return NextResponse.json(tools);
-  } catch (error: any) {
-    console.error('❌ Error in /api/tools:', error.message || error);
-    return NextResponse.json({ error: error.message || 'Failed to fetch tools' }, { status: 500 });
+  } catch (error) {
+    console.error('❌ Error in /api/tools:', (error as Error)?.message || error);
+    return NextResponse.json({ error: 'Failed to fetch tools' }, { status: 500 });
   }
 }
