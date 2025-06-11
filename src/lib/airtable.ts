@@ -1,34 +1,35 @@
-// src/lib/airtable.ts
-const AIRTABLE_API_TOKEN = process.env.NEXT_PUBLIC_AIRTABLE_API_TOKEN!;
-const AIRTABLE_BASE_ID = process.env.NEXT_PUBLIC_AIRTABLE_BASE_ID!;
-const TABLE_NAME = "AI Tools"; // or "Table 1" if you didn’t rename it
+import Airtable from 'airtable';
 
-export type AirtableTool = {
+const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID!);
+
+export interface AirtableTool {
   id: string;
-  fields: {
-    Name: string;
-    Description: string;
-    Link: string;
-    Tags: string[];
-  };
-};
+  Name: string;
+  Description?: string;
+  Link?: string;
+}
 
 export async function fetchTools(): Promise<AirtableTool[]> {
-  const res = await fetch(
-    `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(TABLE_NAME)}?view=Grid%20view`,
+  const records = await base('Tools')
+    .select({
+      view: 'Grid view',
+    })
+    .all();
+
+  return records.map((record) => ({
+    id: record.id,
+    Name: record.get('Name') as string,
+    Description: record.get('Description') as string | undefined,
+    Link: record.get('Link') as string | undefined,
+  }));
+}
+
+export async function addSubscriber(email: string): Promise<void> {
+  await base('Subscribers').create([
     {
-      headers: {
-        Authorization: `Bearer ${AIRTABLE_API_TOKEN}`,
+      fields: {
+        Email: email,
       },
-      next: { revalidate: 60 }, // cache for 60 seconds
-    }
-  );
-
-  if (!res.ok) {
-    console.error(await res.text());
-    throw new Error("Failed to fetch tools from Airtable");
-  }
-
-  const data = await res.json();
-  return data.records;
+    },
+  ]);
 }
