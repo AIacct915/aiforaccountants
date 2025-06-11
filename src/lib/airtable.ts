@@ -11,9 +11,7 @@ export interface AirtableTool {
 
 export async function fetchTools(): Promise<AirtableTool[]> {
   const records = await base('Tools')
-    .select({
-      view: 'Grid view',
-    })
+    .select({ view: 'Grid view' })
     .all();
 
   return records.map((record) => ({
@@ -27,9 +25,7 @@ export async function fetchTools(): Promise<AirtableTool[]> {
 export async function addSubscriber(email: string): Promise<void> {
   await base('Subscribers').create([
     {
-      fields: {
-        Email: email,
-      },
+      fields: { Email: email },
     },
   ]);
 }
