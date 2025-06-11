@@ -7,6 +7,8 @@ export async function GET() {
   try {
     const records = await base('Tools').select({ view: 'Grid view' }).all();
 
+    console.log('✅ Fetched records:', records.length);
+
     const tools = records.map((record) => ({
       id: record.id,
       Name: record.get('Name') as string,
@@ -15,8 +17,8 @@ export async function GET() {
     }));
 
     return NextResponse.json(tools);
-  } catch (error) {
-    console.error('Error fetching tools:', error);
-    return NextResponse.json({ error: 'Failed to fetch tools' }, { status: 500 });
+  } catch (error: any) {
+    console.error('❌ Error in /api/tools:', error.message || error);
+    return NextResponse.json({ error: error.message || 'Failed to fetch tools' }, { status: 500 });
   }
 }
