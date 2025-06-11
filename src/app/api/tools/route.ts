@@ -15,7 +15,7 @@ export async function GET() {
   try {
     console.log('🔍 Reached /api/tools');
 
-    const records = await base('Tools').select().firstPage();
+    const records = await base('AI Tools').select().firstPage();
 
     console.log(`✅ Airtable returned ${records.length} records`);
 
