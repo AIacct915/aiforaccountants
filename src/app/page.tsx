@@ -60,7 +60,7 @@ export default function Home() {
             </button>
           </form>
         ) : (
-          <p className="text-green-600 mt-4">You're on the list! ✅</p>
+          <p className="text-green-600 mt-4">You&rsquo;re on the list! ✅</p>
         )}
       </section>
 
