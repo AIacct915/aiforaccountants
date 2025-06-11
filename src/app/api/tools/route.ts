@@ -1,13 +1,23 @@
 import { NextResponse } from 'next/server';
 import Airtable from 'airtable';
 
-const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID!);
+// ✅ Confirm env vars exist
+const apiKey = process.env.AIRTABLE_API_KEY;
+const baseId = process.env.AIRTABLE_BASE_ID;
+
+if (!apiKey || !baseId) {
+  console.error('❌ Missing Airtable credentials in environment variables.');
+}
+
+const base = new Airtable({ apiKey }).base(baseId!);
 
 export async function GET() {
   try {
-    const records = await base('Tools').select({ view: 'Grid view' }).all();
+    console.log('🔍 Reached /api/tools');
 
-    console.log('✅ Fetched records:', records.length);
+    const records = await base('Tools').select().firstPage();
+
+    console.log(`✅ Airtable returned ${records.length} records`);
 
     const tools = records.map((record) => ({
       id: record.id,
@@ -18,7 +28,8 @@ export async function GET() {
 
     return NextResponse.json(tools);
   } catch (error) {
-    console.error('❌ Error in /api/tools:', (error as Error)?.message || error);
-    return NextResponse.json({ error: 'Failed to fetch tools' }, { status: 500 });
+    const message = (error as Error)?.message || String(error);
+    console.error('❌ Error in /api/tools:', message);
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
