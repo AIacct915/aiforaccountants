@@ -1,7 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { fetchTools, AirtableTool } from '../lib/airtable';
+interface AirtableTool {
+  id: string;
+  Name: string;
+  Description?: string;
+  Link?: string;
+}
 
 export default function Home() {
   const [tools, setTools] = useState<AirtableTool[]>([]);
@@ -10,12 +15,14 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    async function loadTools() {
-      const data = await fetchTools();
-      setTools(data);
-    }
-    loadTools();
-  }, []);
+  async function loadTools() {
+    const res = await fetch('/api/tools');
+    const data = await res.json();
+    setTools(data);
+  }
+  loadTools();
+}, []);
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
