@@ -13,13 +13,13 @@ export const metadata = {
     url: 'https://aiforaccountants.vercel.app',
     siteName: 'AI for Accountants',
     images: [
-      {
-        url: '/og-image.jpg',
-        width: 1200,
-        height: 630,
-        alt: 'AI for Accountants Preview',
-      },
-    ],
+  {
+    url: '/og-image.png', // ← updated here
+    width: 1200,
+    height: 630,
+    alt: 'AI for Accountants Preview',
+  },
+],
     type: 'website',
   },
 };
