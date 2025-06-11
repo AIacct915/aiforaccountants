@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { fetchTools, AirtableTool, addSubscriber } from '../lib/airtable';
+import { fetchTools, AirtableTool } from '../lib/airtable';
 
 export default function Home() {
   const [tools, setTools] = useState<AirtableTool[]>([]);
@@ -21,11 +21,18 @@ export default function Home() {
     e.preventDefault();
     setLoading(true);
     try {
-      await addSubscriber(email);
+      const res = await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+
+      if (!res.ok) throw new Error('Failed to subscribe');
+
       setSubmitted(true);
       setEmail('');
     } catch (err) {
-      console.error('Failed to submit:', err);
+      console.error('Failed:', err);
     } finally {
       setLoading(false);
     }
