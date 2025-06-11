@@ -12,14 +12,21 @@ const base = new Airtable({ apiKey }).base(baseId!);
 
 export async function POST(req: NextRequest) {
   try {
-    const { email } = await req.json();
+    const body = await req.json();
+    const email = body.email;
+
+    console.log('📥 Incoming email submission:', email);
 
     if (!email || !email.includes('@')) {
+      console.warn('⚠️ Invalid email submitted:', email);
       return NextResponse.json({ error: 'Invalid email' }, { status: 400 });
     }
 
-    // Create a new record in "Subscribers"
-    await base('Subscribers').create([{ fields: { Email: email } }]);
+    const result = await base('Subscribers').create([
+      { fields: { Email: email } },
+    ]);
+
+    console.log('✅ Email saved to Airtable:', result[0].id);
 
     return NextResponse.json({ success: true });
   } catch (error) {
