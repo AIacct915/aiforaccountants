@@ -1,102 +1,92 @@
 'use client';
-
 import { useEffect, useState } from 'react';
-interface AirtableTool {
+
+type Tool = {
   id: string;
   Name: string;
   Description?: string;
   Link?: string;
-}
+  Tags?: string[];
+};
 
 export default function Home() {
-  const [tools, setTools] = useState<AirtableTool[]>([]);
+  const [tools, setTools] = useState<Tool[]>([]);
   const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-  async function loadTools() {
-    const res = await fetch('/api/tools');
-    const data = await res.json();
-    setTools(data);
-  }
-  loadTools();
-}, []);
+    const fetchTools = async () => {
+      try {
+        const res = await fetch('/api/tools');
+        const data = await res.json();
+        setTools(data);
+      } catch (error) {
+        console.error('Failed to load tools:', error);
+      }
+    };
 
+    fetchTools();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    try {
-      const res = await fetch('/api/subscribe', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-      });
-
-      if (!res.ok) throw new Error('Failed to subscribe');
-
+    const res = await fetch('/api/subscribe', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+      headers: { 'Content-Type': 'application/json' },
+    });
+    if (res.ok) {
       setSubmitted(true);
       setEmail('');
-    } catch (err) {
-      console.error('Failed:', err);
-    } finally {
-      setLoading(false);
     }
   };
 
   return (
-    <main className="min-h-screen p-8 max-w-3xl mx-auto">
-      <h1 className="text-3xl font-bold text-center mb-4">AI Tools for Accountants</h1>
-      <p className="text-center text-gray-600 mb-10">
+    <main className="max-w-2xl mx-auto px-4 py-12">
+      <h1 className="text-3xl font-bold mb-2">AI Tools for Accountants</h1>
+      <p className="mb-6 text-gray-600">
         Discover the best AI tools for accounting, tax, and finance professionals.
       </p>
 
-      {/* Email Signup Section */}
-      <section className="mb-12 text-center">
-        <h2 className="text-xl font-semibold mb-2">Get Notified When New Tools Are Added</h2>
-        {!submitted ? (
-          <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row justify-center gap-2 mt-4">
-            <input
-              type="email"
-              required
-              placeholder="Your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="px-4 py-2 border rounded w-64"
-            />
-            <button
-              type="submit"
-              disabled={loading}
-              className="bg-black text-white px-4 py-2 rounded hover:bg-gray-800"
-            >
-              {loading ? 'Submitting...' : 'Notify Me'}
-            </button>
-          </form>
-        ) : (
-          <p className="text-green-600 mt-4">You&rsquo;re on the list! ✅</p>
-        )}
-      </section>
+      <h2 className="text-xl font-semibold mt-10 mb-2">Get Notified When New Tools Are Added</h2>
+      <form onSubmit={handleSubmit} className="flex gap-2 mb-10">
+        <input
+          type="email"
+          placeholder="Your email"
+          required
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="border rounded px-4 py-2 flex-grow"
+        />
+        <button type="submit" className="bg-black text-white px-4 py-2 rounded">
+          Notify Me
+        </button>
+      </form>
+      {submitted && <p className="text-green-600 mb-4">You're subscribed! ✅</p>}
 
-      {/* Tool List */}
-      <section className="grid gap-6">
+      <div className="space-y-6">
         {tools.map((tool) => (
           <div key={tool.id} className="border p-4 rounded shadow-sm">
-            <h2 className="text-lg font-semibold">{tool.Name}</h2>
-            <p className="text-gray-600 mt-1">{tool.Description}</p>
-            {tool.Link && (
-              <a
-                href={tool.Link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-600 hover:underline inline-block mt-2"
+            <h3 className="font-semibold text-lg">{tool.Name}</h3>
+            <p className="text-gray-600 mb-2">{tool.Description}</p>
+            {tool.Tags?.map((tag) => (
+              <span
+                key={tag}
+                className="inline-block bg-gray-200 text-sm px-2 py-1 rounded mr-2"
               >
-                Visit Site →
-              </a>
-            )}
+                {tag}
+              </span>
+            ))}
+            <div>
+              {tool.Link && (
+                <a href={tool.Link} className="text-blue-500 mt-2 inline-block" target="_blank">
+                  Visit site →
+                </a>
+              )}
+            </div>
           </div>
         ))}
-      </section>
+      </div>
     </main>
   );
 }
